@@ -12,21 +12,21 @@ Script Purpose:
 IF OBJECT_ID ('bronze.sales_customer','U') IS NOT NULL
 	DROP TABLE bronze.sales_customer;
 CREATE TABLE bronze.sales_customer(
-	sls_customerid			INT,
+	sls_customerid				INT,
 	sls_firstname				NVARCHAR(50),
 	sls_lastname				NVARCHAR(50),
 	sls_country					NVARCHAR(50),
-	sls_score					  INT
+	sls_score					INT
 );
 GO
 
 IF OBJECT_ID ('bronze.sales_employees','U') IS NOT NULL
 	DROP TABLE bronze.sales_employees;
 CREATE TABLE bronze.sales_employees(
-	sls_employeeid			INT,
+	sls_employeeid				INT,
 	sls_firstname				NVARCHAR(50),
 	sls_lastname				NVARCHAR(50),
-	sls_department			NVARCHAR(50),
+	sls_department				NVARCHAR(50),
 	sls_birthdate				DATE,
 	sls_gender					NVARCHAR(50),
 	sls_salary					INT,
@@ -37,17 +37,17 @@ GO
 IF OBJECT_ID ('bronze.sales_orders','U') IS NOT NULL
 	DROP TABLE bronze.sales_orders;
 CREATE TABLE bronze.sales_orders (
-	sls_orderid					INT,
-	slS_productid				INT,
-	sLs_customerid			INT,
+	sls_orderid				INT,
+	sls_productid			INT,
+	sls_customerid			INT,
 	sls_salespersonid		INT,
-	sLs_orderdate				DATE,
-	sls_shipdate				DATE,
+	sls_orderdate			DATE,
+	sls_shipdate			DATE,
 	sls_orderstatus			NVARCHAR(50),
 	sls_shipaddress			NVARCHAR(50),
 	sls_billaddress			NVARCHAR(50),
-	sLs_quantity				INT,
-	sls_sales					  INT,
+	sls_quantity			INT,
+	sls_sales				INT,
 	sls_creationtime		DATETIME
 );
 GO
@@ -55,27 +55,27 @@ GO
 IF OBJECT_ID ('bronze.sales_ordersarchive','U') IS NOT NULL
 	DROP TABLE bronze.sales_ordersarchive;
 CREATE TABLE bronze.sales_ordersarchive (
-	sls_orderid					INT,
-	slS_productid				INT,
-	sLs_customerid			INT,
+	sls_orderid				INT,
+	sls_productid			INT,
+	sls_customerid			INT,
 	sls_salespersonid		INT,
-	sLs_orderdate				DATE,
-	sls_shipdate				DATE,
+	sls_orderdate			DATE,
+	sls_shipdate			DATE,
 	sls_orderstatus			NVARCHAR(50),
 	sls_shipaddress			NVARCHAR(50),
 	sls_billaddress			NVARCHAR(50),
-	sLs_quantity				INT,
-	sls_sales					  INT,
-	sls_creationtime			DATETIME
+	sls_quantity			INT,
+	sls_sales				INT,
+	sls_creationtime		DATETIME
 );
 GO
 
 IF OBJECT_ID ('bronze.sales_products','U') IS NOT NULL
 	DROP TABLE bronze.sales_products;
 CREATE TABLE bronze.sales_products (
-	slS_productid				INT,
-	sLs_product					NVARCHAR(50),
-	sls_category				NVARCHAR (50),
-	sls_price					INT
+	sls_productid			INT,
+	sls_product				NVARCHAR(50),
+	sls_category			NVARCHAR (50),
+	sls_price				INT
 );
 GO
