@@ -1,7 +1,8 @@
 /*
 CTE types
 	Rules: ORDER BY clause cannot be used within the CTE
-	1. Non-Recursive
+	1. Non-Recursive CTE
+		- It is executed only once without repetition
 		1.1 Standalone CTE
 		- Defined and used independently
 			- Runs independently as it's self-contained and does not rely on other CTEs or Queries
@@ -24,7 +25,8 @@ CTE types
 		- CTE withins CTE
 			- A nested cte uses the result of another cte that is why it cannot run independently
 
-	2. Recursive
+	2. Recursive CTE
+		- Self-referencing query that repeatedly processes data until a specific condition is met
 */
 
 --1.1.1 Only 1 cte extracts data from the database and 1 main query extracts data from the cte
@@ -114,7 +116,7 @@ order by cte.totalsales desc;
 ------------------------------------------------------------------------------------------------------
 
 -- 1.2 Nested CTE
--- example: 2 standalone ctes and 1 nested cte and 1 main query
+-- example 1: 2 standalone ctes and 1 nested cte and 1 main query
 -- cte 1 standalone
 with totalsalescte as
 (
@@ -160,7 +162,7 @@ on r.sls_customerid = c.sls_customerid;
 ------------------------------------------------------------------------------------------------------
 
 -- 1.2 Nested CTE
--- example: 2 standalone ctes and 2 nested cte and 1 main query
+-- example 2: 2 standalone ctes and 2 nested cte and 1 main query
 -- cte 1 standalone
 with totalsalescte as
 (
@@ -184,7 +186,7 @@ cte_rank as
 (
 select
 	sls_customerid,
-	case when totalsales is null then ''
+	case when totalsales = null then ''
 		 else rank() over (order by totalsales desc)
 	end as ranksales
 from totalsalescte
@@ -218,4 +220,82 @@ left join cte_rank r
 on r.sls_customerid = c.sls_customerid
 left join cte_segment_cust sc
 on sc.sls_customerid = c.sls_customerid
-order by ranksales;
+order by totalsales desc;
+
+------------------------------------------------------------------------------------------------------
+
+-- 2. Recursive CTE
+
+with base as
+(
+-- Anchor query
+select
+1 as number
+UNION ALL
+-- recursive query
+select
+number + 1
+from base
+where number < 20
+)
+
+select
+*
+from base
+option (maxrecursion 5000);
+
+-- Example : Show the employee hierarchy by displaying each employee's level within the organization
+
+with cte_employee_hierarchy as
+(
+-- Anchor query
+select
+	[sls_employeeid],
+	[sls_firstname],
+	[sls_managerid],
+	1 as level
+from bronze.sales_employees
+where sls_managerid is null
+
+union all
+-- Recursive query
+select
+	e.sls_employeeid,
+	e.sls_firstname,
+	e.sls_managerid,
+	-- 2 as level
+	level + 1
+from bronze.sales_employees as e
+inner join cte_employee_hierarchy ceh
+on e.sls_managerid = ceh.sls_employeeid
+-- where e.sls_managerid = 1
+-- fyi for the 2nd iteration that has sls_managerid = 1, the recursive will run until it reaches and stops
+-- when it finds the sls_employeeid which has the same value as the sls_managerid
+-- realization: 2nd iteration -> sls_managerid = 1 then when recursive cte running it will stop by the time
+-- it finds sls_employeeid = 1
+--		then the level will be the current level reference (1 sls_employeeid) which is
+--		level + 1 = 1 + 1 = 2
+
+-- for the 3rd iteration, sls_managerid = 1, the recursive cte stops when it finds sls_employeeid = 1
+--		then the new level will be the current level reference (1 sls_employeeid) level which is
+--		level + 1 = 1 + 1 = 2
+
+-- for the 4th iteration, sls_managerid = 3, the recursive cte stops when it finds sls_employeeid = 3
+--		then the new level will be the current level reference (2 sls_employeeid) level which is
+--		level + 1 = 2 + 1 = 3
+
+-- for the 5th iteration, sls_managerid = 2, the recursive cte stops when it finds sls_employeeid = 2
+--		then the new level will be the reference (2 sls_employeeid) level which is
+--		level + 1 = 2 + 1 = 3
+)
+
+select 
+	*
+from cte_employee_hierarchy;
+
+select
+	[sls_employeeid],
+	[sls_firstname],
+	[sls_managerid],
+	1 as level
+from bronze.sales_employees;
